@@ -364,9 +364,8 @@
 
   .reveal-hp{ opacity:0; transform:translateY(14px); transition:opacity 0.8s ease, transform 0.8s ease; }
   html.opened .reveal-hp{ opacity:1; transform:none; }
-  html.opened .hp-hearts{ transition-delay:1.5s; }
-  html.opened .hp-date{ transition-delay:1.65s; }
-  html.opened .hp-venue{ transition-delay:1.8s; }
+  html.opened .hp-date{ transition-delay:1.6s; }
+  html.opened .hp-divider{ transition-delay:1.8s; }
   html.opened .hero-photo .scroll-cue{ transition-delay:4.9s; }
 
   .hp-caption{
@@ -375,6 +374,7 @@
     transition:opacity 2.2s ease, letter-spacing 2.2s cubic-bezier(.16,.7,.3,1);
   }
   html.opened .hp-caption{ opacity:1; letter-spacing:0.1em; transition-delay:2.1s; }
+  .hp-caption-2{ margin:16px 0 0; }
   .hp-script-names{
     margin:12px 0 0; display:flex; flex-direction:column; align-items:center; line-height:1.2;
     font-family:'Slight', cursive; color:#fdfbf5;
@@ -393,15 +393,14 @@
     transition:opacity 2.2s ease, letter-spacing 2.2s cubic-bezier(.16,.7,.3,1);
   }
   html.opened .hp-script-and{ opacity:0.85; letter-spacing:0.02em; transition-delay:2.1s; }
-  .hp-hearts{ margin:8px 0 0; font-size:20px; letter-spacing:4px; }
   .hp-date{
     margin:8px 0 0; font-family:'Cormorant Garamond', serif; font-weight:600;
     font-size:clamp(22px, 6.4vw, 30px); letter-spacing:0.03em;
     font-variant-numeric: tabular-nums; color:#faf7ee;
   }
-  .hp-venue{
-    margin:6px 0 0; font-family:'Noto Sans TC', sans-serif; font-size:13px; line-height:1.6;
-    letter-spacing:0.04em; color:rgba(250,247,238,0.75);
+  .hp-divider{
+    margin:14px 0 0; width:34px; height:1px; border:none;
+    background:rgba(250,247,238,0.55);
   }
   .hero-photo .scroll-cue{ margin-top:8px; color:rgba(250,247,238,0.55); position:relative; z-index:3; }
 
@@ -610,8 +609,8 @@
   .bgm-player.paused .bgm-disc-photo{ animation-play-state:paused; }
   @keyframes bgmSpin{ 100%{ transform:rotate(360deg); } }
   .bgm-tonearm{
-    position:absolute; top:-3px; right:-7px; width:22px; height:22px;
-    transform-origin:88% 12%; transform:rotate(-30deg);
+    position:absolute; top:-4px; right:-7px; width:26px; height:26px;
+    transform-origin:85% 15%; transform:rotate(28deg);
     transition:transform 0.4s ease; pointer-events:none;
   }
   .bgm-tonearm::before{
@@ -619,10 +618,10 @@
     background:var(--ink-faint); border-radius:2px;
   }
   .bgm-tonearm::after{
-    content:""; position:absolute; bottom:-3px; right:-2px; width:7px; height:7px;
+    content:""; position:absolute; bottom:-2px; right:0; width:7px; height:7px;
     border-radius:50%; background:var(--surface); border:1.5px solid var(--ink-faint);
   }
-  .bgm-player:not(.paused) .bgm-tonearm{ transform:rotate(-6deg); }
+  .bgm-player:not(.paused) .bgm-tonearm{ transform:rotate(10deg); }
   .bgm-info{ flex:1; min-width:0; text-align:center; }
   .bgm-title{
     margin:0; font-family:'Noto Serif TC', serif; font-size:13.5px; font-weight:600;
@@ -690,15 +689,14 @@
     <audio id="bgmAudio" src="bgm.mp3" loop preload="auto"></audio>
 
     <div class="hero-photo-content">
-      <p class="hp-caption">save the date</p>
       <div class="hp-script-names">
         <span class="hp-script-line hp-line-1">Linus</span>
         <span class="hp-script-and">and</span>
         <span class="hp-script-line hp-line-2">Yumiss</span>
       </div>
-      <p class="hp-hearts reveal-hp" aria-hidden="true">👰🤍🤍🤵</p>
+      <p class="hp-caption hp-caption-2">save the date</p>
       <p class="hp-date reveal-hp" id="heroDate">January | 17 | 2027</p>
-      <p class="hp-venue reveal-hp">台北君品酒店<br>5樓 亮廳</p>
+      <div class="hp-divider reveal-hp" aria-hidden="true"></div>
     </div>
 
     <div class="scroll-cue reveal-hp">
