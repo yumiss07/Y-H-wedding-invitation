@@ -227,9 +227,21 @@
     display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
     overflow:hidden; padding:0 24px 40px; text-align:center;
   }
-  .hero-photo-bg{ position:absolute; inset:0; background:#cfd8d2; }
+  .hero-photo-bg{ position:absolute; inset:0; background:#cfd8d2; overflow:hidden; }
   .hero-photo-bg svg{ width:100%; height:100%; display:block; }
-  .hero-photo-bg img{ width:100%; height:100%; display:block; object-fit:cover; object-position:50% 28%; }
+  .hero-photo-bg img{
+    width:100%; height:100%; display:block; object-fit:cover; object-position:50% 28%;
+    transform-origin:50% 30%;
+    animation:heroPhotoBreathe 22s ease-in-out infinite;
+  }
+  @keyframes heroPhotoBreathe{
+    0%{ transform:scale(1.16); }
+    45%, 55%{ transform:scale(1.0); }
+    100%{ transform:scale(1.16); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-photo-bg img{ animation:none; }
+  }
   .hero-photo-video{
     position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 28%;
     z-index:4; opacity:0; transition:opacity 0.35s ease; pointer-events:none;
@@ -237,7 +249,7 @@
   .hero-photo-video.show{ opacity:1; }
   .hero-photo-scrim{
     position:absolute; inset:0;
-    background:linear-gradient(to top, rgba(12,10,7,0.78) 0%, rgba(12,10,7,0.42) 42%, rgba(12,10,7,0.05) 68%);
+    background:linear-gradient(to top, rgba(8,6,4,0.9) 0%, rgba(10,8,5,0.8) 12%, rgba(12,10,7,0.42) 42%, rgba(12,10,7,0.05) 68%);
     z-index:1;
   }
   .hero-photo-placeholder-note{
@@ -254,29 +266,34 @@
 
   .reveal-hp{ opacity:0; transform:translateY(14px); transition:opacity 0.8s ease, transform 0.8s ease; }
   html.opened .reveal-hp{ opacity:1; transform:none; }
-  html.opened .hp-caption{ transition-delay:0.05s; }
-  html.opened .hp-hearts{ transition-delay:1s; }
-  html.opened .hp-date{ transition-delay:1.15s; }
-  html.opened .hp-venue{ transition-delay:1.3s; }
-  html.opened .hero-photo .scroll-cue{ transition-delay:1.5s; }
+  html.opened .hp-hearts{ transition-delay:1.5s; }
+  html.opened .hp-date{ transition-delay:1.65s; }
+  html.opened .hp-venue{ transition-delay:1.8s; }
+  html.opened .hero-photo .scroll-cue{ transition-delay:4.9s; }
 
   .hp-caption{
-    margin:0; font-family:'Cormorant Garamond', serif; font-size:16px; letter-spacing:0.1em;
-    color:#f6f1e4;
+    margin:0; font-family:'Cormorant Garamond', serif; font-size:16px;
+    letter-spacing:0.6em; opacity:0; color:#f6f1e4;
+    transition:opacity 2.2s ease, letter-spacing 2.2s cubic-bezier(.16,.7,.3,1);
   }
+  html.opened .hp-caption{ opacity:1; letter-spacing:0.1em; transition-delay:2.1s; }
   .hp-script-names{
     margin:6px 0 0; display:flex; flex-direction:column; align-items:center; line-height:0.92;
     font-family:'Great Vibes', cursive; color:#fdfbf5;
   }
-  .hp-script-line, .hp-script-and{
+  .hp-script-line{
     display:inline-block; clip-path:inset(0 100% 0 0);
-    transition:clip-path 0.85s cubic-bezier(.45,0.05,.35,1);
+    transition:clip-path 0.6s cubic-bezier(.45,0.05,.35,1);
   }
-  html.opened .hp-line-1{ clip-path:inset(0 0 0 0); transition-delay:0.15s; }
-  html.opened .hp-script-and{ clip-path:inset(0 0 0 0); transition-delay:0.5s; transition-duration:0.4s; }
-  html.opened .hp-line-2{ clip-path:inset(0 0 0 0); transition-delay:0.65s; }
+  html.opened .hp-line-1{ clip-path:inset(0 0 0 0); transition-delay:0.5s; }
+  html.opened .hp-line-2{ clip-path:inset(0 0 0 0); transition-delay:0.9s; }
   .hp-script-line{ font-size:clamp(52px, 15vw, 78px); }
-  .hp-script-and{ font-size:clamp(20px, 6vw, 28px); margin:2px 0; opacity:0.85; }
+  .hp-script-and{
+    display:block; font-size:clamp(20px, 6vw, 28px); margin:2px 0;
+    letter-spacing:0.6em; opacity:0;
+    transition:opacity 2.2s ease, letter-spacing 2.2s cubic-bezier(.16,.7,.3,1);
+  }
+  html.opened .hp-script-and{ opacity:0.85; letter-spacing:0.02em; transition-delay:2.1s; }
   .hp-hearts{ margin:10px 0 0; font-size:20px; letter-spacing:4px; }
   .hp-date{
     margin:14px 0 0; font-family:'Cormorant Garamond', serif; font-weight:600;
@@ -434,7 +451,7 @@
     <video class="hero-photo-video" id="heroVideo" src="save-the-date.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
 
     <div class="hero-photo-content">
-      <p class="hp-caption reveal-hp">save the date</p>
+      <p class="hp-caption">save the date</p>
       <div class="hp-script-names">
         <span class="hp-script-line hp-line-1">Linus</span>
         <span class="hp-script-and">and</span>
@@ -651,7 +668,7 @@
       var heroVideo = document.getElementById('heroVideo');
       if (heroVideo){
         try {
-          heroVideo.currentTime = 0.85; // 跳過影片開頭的白色淡入
+          heroVideo.currentTime = 0.6; // 跳過影片開頭的白色淡入
         } catch(e){}
         var playPromise = heroVideo.play();
         if (playPromise && playPromise.then){
