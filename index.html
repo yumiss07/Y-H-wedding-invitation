@@ -380,7 +380,7 @@
   html.opened .hp-line-2{ clip-path:inset(0 0 0 0); transition-delay:0.9s; }
   .hp-script-line{ font-size:clamp(52px, 15vw, 78px); }
   .hp-script-and{
-    display:block; font-size:clamp(20px, 6vw, 28px); margin:10px 0;
+    display:block; font-size:clamp(20px, 6vw, 28px); margin:10px 0 20px;
     letter-spacing:0.6em; opacity:0;
     transition:opacity 2.2s ease, letter-spacing 2.2s cubic-bezier(.16,.7,.3,1);
   }
@@ -1055,9 +1055,6 @@
 
       var heroVideo = document.getElementById('heroVideo');
       if (heroVideo){
-        try {
-          heroVideo.currentTime = 0.6; // 跳過影片開頭的白色淡入
-        } catch(e){}
         var playPromise = heroVideo.play();
         if (playPromise && playPromise.then){
           playPromise.then(function(){
