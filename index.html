@@ -148,7 +148,7 @@
     gap:8px; padding:11% 7%;
     box-shadow:0 10px 20px -10px rgba(20,14,8,0.3);
     animation:letterBob 3s ease-in-out infinite;
-    transition:transform 0.8s cubic-bezier(.2,.8,.3,1) 0.1s, box-shadow 0.8s ease 0.1s;
+    transition:transform 1.8s cubic-bezier(.22,.7,.2,1) 0.15s, box-shadow 1.8s ease 0.15s;
     z-index:2;
   }
   @keyframes letterBob{
@@ -1203,10 +1203,36 @@
   var bgmStarted = false;
   var paperCard = document.getElementById('paperCard');
   var opened = false;
+  var BGM_VOLUME = 1;
+
+  // 音樂淡入：從音量 0 慢慢升到正常音量，避免一開始就突然大聲
+  function fadeInBgm(audio, duration){
+    if (!audio) return;
+    duration = duration || 1800;
+    audio.volume = 0;
+    var startTime = null;
+    function step(ts){
+      if (audio.paused) return;
+      if (startTime === null) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      audio.volume = BGM_VOLUME * progress;
+      if (progress < 1){
+        requestAnimationFrame(step);
+      }
+    }
+    requestAnimationFrame(step);
+  }
 
   function openEnvelope(){
     if (opened) return;
     opened = true;
+
+    // 信紙原本正在輕輕晃動的動畫中，先讓它停格、強制瀏覽器重新計算一次樣式，
+    // 再加上 opening，CSS 的位移 transition 才會確實「慢慢」跑上去，而不是瞬間跳過去
+    if (envLetter){
+      envLetter.style.animation = 'none';
+      void envLetter.offsetHeight;
+    }
     gate.classList.add('opening');
 
     // 音樂要在點擊當下（同一個使用者手勢呼叫堆疊內）就啟動，
@@ -1217,6 +1243,7 @@
       bgmToggle.setAttribute('aria-pressed', 'true');
       bgmToggle.setAttribute('aria-label', '暫停背景音樂');
       var bgmPlay = bgmAudio.play();
+      fadeInBgm(bgmAudio, 1800);
       if (bgmPlay && bgmPlay.catch){
         bgmPlay.catch(function(){
           // 仍被瀏覽器擋下時，改回暫停視覺狀態，賓客可自行點播放鍵
@@ -1235,7 +1262,7 @@
       return;
     }
 
-    // 1) 信封受壓、封口掀開，讓「誠摯邀請...」文字停留約 2 秒再接續
+    // 1) 信封受壓、封口掀開，信紙慢慢往上滑出，讓「誠摯邀請...」文字停留一下再接續
     setTimeout(function(){
       // 2) 封口一掀開，立刻接上內頁 + 播放 Save the date 影片
       document.documentElement.classList.add('opened');
@@ -1262,7 +1289,7 @@
         gate.classList.add('hide');
         setTimeout(function(){ gate.style.display = 'none'; }, 620);
       }, 260);
-    }, 2000);
+    }, 2800);
   }
   envBtn.addEventListener('click', openEnvelope);
   envBtn.addEventListener('keydown', function(e){
@@ -1394,6 +1421,7 @@
     if (!bgmAudio) return;
     if (bgmAudio.paused){
       bgmAudio.play().then(function(){
+        fadeInBgm(bgmAudio, 1200);
         bgmToggle.setAttribute('aria-pressed', 'true');
         bgmToggle.setAttribute('aria-label', '暫停背景音樂');
         bgmPlayer.classList.remove('paused');
