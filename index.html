@@ -1276,7 +1276,7 @@
       bgmToggle.setAttribute('aria-pressed', 'true');
       bgmToggle.setAttribute('aria-label', '暫停背景音樂');
       // 播放動作仍須在點擊當下同步呼叫（避免手機瀏覽器擋自動播放），
-      // 但先靜音播放，等內頁 1 出現的同一時間點才淡入有聲音，避免音樂比畫面早進場
+      // 但先靜音播放，等信封完全收起、內頁完全出現後才淡入有聲音，避免音樂比畫面早進場
       var bgmPlay = bgmAudio.play();
       bgmAudio.volume = 0;
       if (bgmPlay && bgmPlay.catch){
@@ -1304,9 +1304,6 @@
       document.documentElement.style.overflow = 'auto';
       document.body.style.overflow = 'visible';
 
-      // 音樂在這一刻（內頁 1 出現的同時）才淡入有聲音
-      if (bgmAudio && !bgmAudio.paused){ fadeInBgm(bgmAudio, 1800); }
-
       var heroVideo = document.getElementById('heroVideo');
       if (heroVideo){
         var playPromise = heroVideo.play();
@@ -1325,7 +1322,11 @@
       setTimeout(function(){
         // 3) 收起信封
         gate.classList.add('hide');
-        setTimeout(function(){ gate.style.display = 'none'; }, 1650);
+        setTimeout(function(){
+          gate.style.display = 'none';
+          // 音樂等信封完全收起、內頁完全顯示之後才淡入有聲音，避免比畫面早進場
+          if (bgmAudio && !bgmAudio.paused){ fadeInBgm(bgmAudio, 1800); }
+        }, 1650);
       }, 260);
     }, 2800);
   }
