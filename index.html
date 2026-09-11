@@ -1324,10 +1324,8 @@
         gate.classList.add('hide');
         setTimeout(function(){
           gate.style.display = 'none';
-          // 音樂等信封完全收起、內頁完全顯示之後，再晚 1 秒才淡入有聲音
-          setTimeout(function(){
-            if (bgmAudio && !bgmAudio.paused){ fadeInBgm(bgmAudio, 1800); }
-          }, 1000);
+          // 音樂等信封完全收起、換成合照畫面之後才淡入有聲音，避免比畫面早進場
+          if (bgmAudio && !bgmAudio.paused){ fadeInBgm(bgmAudio, 1800); }
         }, 1650);
       }, 260);
     }, 2800);
