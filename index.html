@@ -1298,21 +1298,28 @@
       bgmPlayer.classList.remove('paused');
       bgmToggle.setAttribute('aria-pressed', 'true');
       bgmToggle.setAttribute('aria-label', '暫停背景音樂');
-      // 播放動作仍須在點擊當下同步呼叫（避免手機瀏覽器擋自動播放），
-      // 但先靜音播放，等信封完全收起、內頁完全出現後才淡入有聲音，避免音樂比畫面早進場
+      // 播放權限仍須在點擊當下（使用者手勢內）「解鎖」，避免手機瀏覽器擋自動播放，
+      // 但解鎖後立刻暫停、把進度歸零，等信封完全收起、內頁完全出現後才真正播放，
+      // 這樣才不會讓音樂在靜音等待期間偷跑進度，導致聽到時前奏已經被跳過
       // iOS Safari 會忽略 audio.volume 的設定（永遠等同原始音量），改用 Web Audio 的 GainNode 靜音才真正有效
       ensureBgmGraph();
       setBgmGain(0);
       if (bgmAudioCtx && bgmAudioCtx.state === 'suspended'){ bgmAudioCtx.resume(); }
-      var bgmPlay = bgmAudio.play();
+      var bgmUnlock = bgmAudio.play();
       bgmAudio.volume = 0;
-      if (bgmPlay && bgmPlay.catch){
-        bgmPlay.catch(function(){
+      if (bgmUnlock && bgmUnlock.then){
+        bgmUnlock.then(function(){
+          bgmAudio.pause();
+          bgmAudio.currentTime = 0;
+        }).catch(function(){
           // 仍被瀏覽器擋下時，改回暫停視覺狀態，賓客可自行點播放鍵
           bgmToggle.setAttribute('aria-pressed', 'false');
           bgmToggle.setAttribute('aria-label', '播放背景音樂');
           bgmPlayer.classList.add('paused');
         });
+      } else {
+        bgmAudio.pause();
+        bgmAudio.currentTime = 0;
       }
     }
 
@@ -1351,8 +1358,12 @@
         gate.classList.add('hide');
         setTimeout(function(){
           gate.style.display = 'none';
-          // 音樂等信封完全收起、換成合照畫面之後才淡入有聲音，避免比畫面早進場
-          if (bgmAudio && !bgmAudio.paused){ setBgmGain(BGM_VOLUME); }
+          // 信封完全收起、換成合照畫面的這一刻，音樂才真正從頭開始播放（滿音量、無淡入）
+          if (bgmAudio){
+            setBgmGain(BGM_VOLUME);
+            var bgmRealPlay = bgmAudio.play();
+            if (bgmRealPlay && bgmRealPlay.catch){ bgmRealPlay.catch(function(){}); }
+          }
         }, 1650);
       }, 260);
     }, 2800);
