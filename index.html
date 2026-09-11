@@ -1352,7 +1352,7 @@
         setTimeout(function(){
           gate.style.display = 'none';
           // 音樂等信封完全收起、換成合照畫面之後才淡入有聲音，避免比畫面早進場
-          if (bgmAudio && !bgmAudio.paused){ fadeInBgm(bgmAudio, 150); }
+          if (bgmAudio && !bgmAudio.paused){ setBgmGain(BGM_VOLUME); }
         }, 1650);
       }, 260);
     }, 2800);
