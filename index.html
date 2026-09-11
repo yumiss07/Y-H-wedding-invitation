@@ -1224,6 +1224,29 @@
   var paperCard = document.getElementById('paperCard');
   var opened = false;
   var BGM_VOLUME = 1;
+  var bgmAudioCtx = null;
+  var bgmGainNode = null;
+
+  // iOS Safari 不會理會 audio.volume 的 JS 設定（永遠等同原始音量），
+  // 所以靜音／淡入改用 Web Audio 的 GainNode 來控制，才能在 iPhone 上真正有效
+  function ensureBgmGraph(){
+    if (!bgmAudio || bgmGainNode) return;
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      bgmAudioCtx = new Ctx();
+      var sourceNode = bgmAudioCtx.createMediaElementSource(bgmAudio);
+      bgmGainNode = bgmAudioCtx.createGain();
+      bgmGainNode.gain.value = 0;
+      sourceNode.connect(bgmGainNode).connect(bgmAudioCtx.destination);
+    } catch (e){
+      bgmGainNode = null;
+    }
+  }
+  function setBgmGain(v){
+    if (bgmGainNode){ bgmGainNode.gain.value = v; }
+    else if (bgmAudio){ bgmAudio.volume = v; }
+  }
 
   // 播放線條隨音樂進度慢慢拉長，並帶著小圓點一起前進
   function updateBgmProgress(){
@@ -1242,13 +1265,13 @@
   function fadeInBgm(audio, duration){
     if (!audio) return;
     duration = duration || 1800;
-    audio.volume = 0;
+    setBgmGain(0);
     var startTime = null;
     function step(ts){
       if (audio.paused) return;
       if (startTime === null) startTime = ts;
       var progress = Math.min((ts - startTime) / duration, 1);
-      audio.volume = BGM_VOLUME * progress;
+      setBgmGain(BGM_VOLUME * progress);
       if (progress < 1){
         requestAnimationFrame(step);
       }
@@ -1277,6 +1300,10 @@
       bgmToggle.setAttribute('aria-label', '暫停背景音樂');
       // 播放動作仍須在點擊當下同步呼叫（避免手機瀏覽器擋自動播放），
       // 但先靜音播放，等信封完全收起、內頁完全出現後才淡入有聲音，避免音樂比畫面早進場
+      // iOS Safari 會忽略 audio.volume 的設定（永遠等同原始音量），改用 Web Audio 的 GainNode 靜音才真正有效
+      ensureBgmGraph();
+      setBgmGain(0);
+      if (bgmAudioCtx && bgmAudioCtx.state === 'suspended'){ bgmAudioCtx.resume(); }
       var bgmPlay = bgmAudio.play();
       bgmAudio.volume = 0;
       if (bgmPlay && bgmPlay.catch){
@@ -1459,6 +1486,8 @@
   bgmToggle.addEventListener('click', function(){
     if (!bgmAudio) return;
     if (bgmAudio.paused){
+      ensureBgmGraph();
+      if (bgmAudioCtx && bgmAudioCtx.state === 'suspended'){ bgmAudioCtx.resume(); }
       bgmAudio.play().then(function(){
         fadeInBgm(bgmAudio, 1200);
         bgmToggle.setAttribute('aria-pressed', 'true');
