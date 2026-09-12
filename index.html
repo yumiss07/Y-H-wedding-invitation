@@ -1514,6 +1514,23 @@
     }
   });
 
+  // 切到別的 App／分頁時自動暫停音樂，切回網頁時（如果原本正在播放）才自動恢復播放
+  var bgmPausedByVisibility = false;
+  document.addEventListener('visibilitychange', function(){
+    if (!bgmAudio) return;
+    if (document.hidden){
+      if (!bgmAudio.paused){
+        bgmAudio.pause();
+        bgmPausedByVisibility = true;
+      }
+    } else if (bgmPausedByVisibility){
+      bgmPausedByVisibility = false;
+      if (bgmAudioCtx && bgmAudioCtx.state === 'suspended'){ bgmAudioCtx.resume(); }
+      var bgmResume = bgmAudio.play();
+      if (bgmResume && bgmResume.catch){ bgmResume.catch(function(){}); }
+    }
+  });
+
   setTimeout(function(){
     if (!opened){
       document.documentElement.style.overflow = 'auto';
