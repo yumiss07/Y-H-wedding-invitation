@@ -1299,7 +1299,7 @@
       bgmToggle.setAttribute('aria-pressed', 'true');
       bgmToggle.setAttribute('aria-label', '暫停背景音樂');
       // 播放權限仍須在點擊當下（使用者手勢內）「解鎖」，避免手機瀏覽器擋自動播放，
-      // 但解鎖後立刻暫停、把進度歸零，等信封完全收起、內頁完全出現後才真正播放，
+      // 但解鎖後立刻暫停、把進度歸零，等內頁 1 出現的同一時間點才真正播放＋淡入，
       // 這樣才不會讓音樂在靜音等待期間偷跑進度，導致聽到時前奏已經被跳過
       // iOS Safari 會忽略 audio.volume 的設定（永遠等同原始音量），改用 Web Audio 的 GainNode 靜音才真正有效
       ensureBgmGraph();
@@ -1338,6 +1338,13 @@
       document.documentElement.style.overflow = 'auto';
       document.body.style.overflow = 'visible';
 
+      // 音樂在這一刻（內頁 1 出現的同一時間點）才真正播放、淡入有聲音
+      if (bgmAudio){
+        var bgmRealPlay = bgmAudio.play();
+        if (bgmRealPlay && bgmRealPlay.catch){ bgmRealPlay.catch(function(){}); }
+        fadeInBgm(bgmAudio, 1800);
+      }
+
       var heroVideo = document.getElementById('heroVideo');
       if (heroVideo){
         var playPromise = heroVideo.play();
@@ -1358,12 +1365,6 @@
         gate.classList.add('hide');
         setTimeout(function(){
           gate.style.display = 'none';
-          // 信封完全收起、換成合照畫面的這一刻，音樂才真正從頭開始播放（滿音量、無淡入）
-          if (bgmAudio){
-            setBgmGain(BGM_VOLUME);
-            var bgmRealPlay = bgmAudio.play();
-            if (bgmRealPlay && bgmRealPlay.catch){ bgmRealPlay.catch(function(){}); }
-          }
         }, 1650);
       }, 260);
     }, 2800);
