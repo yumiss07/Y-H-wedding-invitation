@@ -1338,11 +1338,11 @@
       document.documentElement.style.overflow = 'auto';
       document.body.style.overflow = 'visible';
 
-      // 音樂在這一刻（內頁 1 出現的同一時間點）才真正播放，直接原音量播放、不做淡入
+      // 音樂在這一刻（內頁 1 出現的同一時間點）才真正播放、淡入有聲音
       if (bgmAudio){
-        setBgmGain(BGM_VOLUME);
         var bgmRealPlay = bgmAudio.play();
         if (bgmRealPlay && bgmRealPlay.catch){ bgmRealPlay.catch(function(){}); }
+        fadeInBgm(bgmAudio, 1800);
       }
 
       var heroVideo = document.getElementById('heroVideo');
@@ -1500,8 +1500,8 @@
     if (bgmAudio.paused){
       ensureBgmGraph();
       if (bgmAudioCtx && bgmAudioCtx.state === 'suspended'){ bgmAudioCtx.resume(); }
-      setBgmGain(BGM_VOLUME);
       bgmAudio.play().then(function(){
+        fadeInBgm(bgmAudio, 1200);
         bgmToggle.setAttribute('aria-pressed', 'true');
         bgmToggle.setAttribute('aria-label', '暫停背景音樂');
         bgmPlayer.classList.remove('paused');
